@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Multi-Agent QA AI System - Quick Start Script
-echo "🚀 Setting up Multi-Agent QA AI System..."
+# Multi-Agent QA AI System - AWS Bedrock Setup Script
+echo "🚀 Setting up Multi-Agent QA AI System with AWS Bedrock..."
 
 # Check if virtual environment exists
 if [ ! -d "venv" ]; then
@@ -56,6 +56,22 @@ fi
 
 echo "✅ Node.js dependencies installed successfully"
 
+# Check if AWS CLI is installed
+if ! command -v aws &> /dev/null; then
+    echo "⚠️  AWS CLI is not installed. Please install AWS CLI for Bedrock access:"
+    echo "   https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html"
+    echo "   After installing, run: aws configure"
+else
+    echo "✅ AWS CLI is installed"
+    
+    # Check if AWS is configured
+    if aws sts get-caller-identity &> /dev/null; then
+        echo "✅ AWS credentials configured"
+    else
+        echo "⚠️  AWS credentials not configured. Run: aws configure"
+    fi
+fi
+
 # Check if Ollama is installed
 if ! command -v ollama &> /dev/null; then
     echo "⚠️  Ollama is not installed. Please install Ollama from https://ollama.ai"
@@ -77,27 +93,53 @@ fi
 
 # Create .env file if it doesn't exist
 if [ ! -f .env ]; then
-    echo "📝 Creating .env file from template..."
-    cp .env.example .env
-    echo "✅ .env file created. Please edit it with your API keys and configuration."
+    echo "📝 Creating .env file..."
+    cat > .env << 'EOF'
+# AWS Bedrock Configuration
+AWS_REGION=us-east-1
+AWS_ACCESS_KEY_ID=your_aws_access_key_here
+AWS_SECRET_ACCESS_KEY=your_aws_secret_key_here
+
+# Jira Configuration
+JIRA_URL=https://your-company.atlassian.net
+JIRA_USER=your_email@company.com
+JIRA_API_TOKEN=your_jira_api_token
+STORY_KEY=your_jira_story_key
+
+# WebdriverIO Server
+SERVER_URL=http://localhost:3000
+
+# Optional: Ollama Configuration (if running on different host/port)
+# OLLAMA_BASE_URL=http://localhost:11434
+EOF
+    echo "✅ .env file created. Please edit it with your AWS and Jira configuration."
 else
     echo "✅ .env file already exists"
 fi
 
+# Run validation script
+echo ""
+echo "🔍 Running AWS Bedrock validation..."
+python3 validate_bedrock_setup.py
+
 echo ""
 echo "🎉 Setup complete! Next steps:"
 echo ""
-echo "1. Edit the .env file with your API keys:"
-echo "   - OPENAI_API_KEY: Get from https://platform.openai.com/api-keys"
+echo "1. Edit the .env file with your configuration:"
+echo "   - AWS_REGION, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY: Your AWS credentials"
 echo "   - JIRA_URL, JIRA_USER, JIRA_API_TOKEN: Your Jira configuration"
 echo "   - STORY_KEY: The Jira story key you want to test"
 echo ""
-echo "2. Start the WebdriverIO server:"
+echo "2. Ensure Bedrock model access:"
+echo "   - Go to AWS Bedrock Console → Model Access"
+echo "   - Request access to Anthropic Claude models"
+echo ""
+echo "3. Start the WebdriverIO server:"
 echo "   npm start"
 echo ""
-echo "3. In another terminal, start Jupyter:"
+echo "4. In another terminal, start Jupyter:"
 echo "   jupyter notebook multi-agent-qa-ai-system.ipynb"
 echo ""
-echo "4. Run the notebook cells to execute the multi-agent workflow!"
+echo "5. Run the notebook cells to execute the multi-agent workflow!"
 echo ""
-echo "For troubleshooting, check the README.md file."
+echo "📚 For detailed migration info, see: BEDROCK_MIGRATION.md"

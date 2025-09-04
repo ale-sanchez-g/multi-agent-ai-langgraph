@@ -1,17 +1,20 @@
-# Multi-Agent QA AI System with LangGraph
+# Multi-Agent QA AI System with LangGraph - AWS Bedrock Implementation
 
 This project is a **multi-agent AI system** built on top of LangGraph and LangChain, specifically designed for **automated QA testing workflows**. The system integrates with Jira for requirements gathering, generates BDD test cases, and performs automated web testing using a multi-agent architecture.
+
+**🚀 Recently migrated from OpenAI to AWS Bedrock for enhanced cost-efficiency and enterprise-grade features!**
 
 ## Features
 
 - **Jira Integration:** Fetches user stories and requirements directly from Jira using REST API
-- **BDD Test Case Generation:** Automatically generates Behavior-Driven Development test cases in Gherkin format
+- **BDD Test Case Generation:** Automatically generates Behavior-Driven Development test cases in Gherkin format using AWS Bedrock Claude models
 - **Vector Database Storage:** Uses Chroma with Ollama embeddings for efficient document retrieval (RAG)
 - **Web Test Automation:** Performs automated browser testing using WebdriverIO integration
 - **Multi-Agent Orchestration:** QA Manager agent coordinates two specialized agents:
-  - **QA Agent:** Generates BDD test cases from requirements
+  - **QA Agent:** Generates BDD test cases from requirements using Claude 3 Sonnet
   - **QA Automation Agent:** Executes automated web tests
 - **Supervisor Architecture:** Uses LangGraph supervisor for intelligent task routing and coordination
+- **AWS Bedrock Integration:** Enterprise-grade LLM capabilities with enhanced security and cost controls
 
 ## Architecture
 
@@ -38,6 +41,7 @@ Before setting up the project, ensure you have the following installed:
 - **Node.js 16+** - Required for WebdriverIO server
 - **Chrome Browser** - Required for web automation
 - **Ollama** - Required for local embeddings (install from [ollama.ai](https://ollama.ai))
+- **AWS Account** - Required for Bedrock access with Claude models enabled
 
 ## Quick Start
 
@@ -90,8 +94,10 @@ cp .env.example .env
 Edit the `.env` file with your configuration:
 
 ```env
-# OpenAI Configuration
-OPENAI_API_KEY=your_openai_api_key_here
+# AWS Bedrock Configuration
+AWS_REGION=us-east-1
+AWS_ACCESS_KEY_ID=your_aws_access_key_here
+AWS_SECRET_ACCESS_KEY=your_aws_secret_key_here
 
 # Jira Configuration
 JIRA_URL=https://your-company.atlassian.net
@@ -102,6 +108,12 @@ STORY_KEY=your_jira_story_key
 # WebdriverIO Server
 SERVER_URL=http://localhost:3000
 ```
+
+**How to get AWS Bedrock access:**
+1. Create an AWS account and set up IAM user with Bedrock permissions
+2. Go to AWS Bedrock Console → Model Access
+3. Request access to Anthropic Claude models
+4. Generate AWS access keys in IAM console
 
 **How to get Jira API Token:**
 1. Go to https://id.atlassian.com/manage-profile/security/api-tokens
@@ -143,7 +155,7 @@ Run the cells in sequence:
 2. **Jira Integration** - Fetches story description from Jira
 3. **Text Processing** - Chunks and embeds the content
 4. **Vector Database** - Stores chunks in Chroma for retrieval
-5. **LLM Setup** - Initializes OpenAI GPT-4 model
+5. **LLM Setup** - Initializes AWS Bedrock Claude model
 6. **QA Agent** - Creates BDD test case generation agent
 7. **Automation Agent** - Creates web testing automation agent
 8. **Manager Agent** - Creates supervisor to orchestrate both agents
@@ -255,8 +267,10 @@ Issue: Welcome message element not visible on dashboard
    - Ensure JIRA_URL format is correct (https://domain.atlassian.net)
 
 5. **OpenAI API Errors**
-   - Verify API key is valid and has sufficient credits
-   - Check if GPT-4 access is enabled for your account
+   - **DEPRECATED**: This project now uses AWS Bedrock instead of OpenAI
+   - For Bedrock issues: Verify AWS credentials and model access
+   - Check AWS region supports Bedrock service
+   - Ensure Claude model access is granted in Bedrock console
 
 ## Project Structure
 
@@ -398,11 +412,20 @@ jupyter notebook multi-agent-qa-ai-system.ipynb  # Open notebook
 # Ollama commands
 ollama serve                         # Start Ollama service
 ollama pull nomic-embed-text:v1.5   # Download embedding model
+
+# AWS CLI setup
+aws configure                        # Configure AWS credentials
+aws bedrock list-foundation-models  # Check available models
 ```
 
 ### Environment Variables Quick Reference
 ```env
-OPENAI_API_KEY=sk-...               # OpenAI API key
+# AWS Bedrock Configuration
+AWS_REGION=us-east-1                # AWS region for Bedrock
+AWS_ACCESS_KEY_ID=AKIA...          # AWS access key
+AWS_SECRET_ACCESS_KEY=...          # AWS secret key
+
+# Jira Configuration  
 JIRA_URL=https://company.atlassian.net  # Jira instance URL
 JIRA_USER=user@company.com          # Jira username/email
 JIRA_API_TOKEN=...                  # Jira API token
@@ -413,18 +436,24 @@ STORY_KEY=PROJ-123                  # Jira story key to process
 1. **Jira Integration** → Fetch user story requirements
 2. **Text Processing** → Chunk and embed content using Ollama
 3. **Vector Storage** → Store in Chroma database for RAG
-4. **QA Agent** → Generate BDD test cases using GPT-4
+4. **QA Agent** → Generate BDD test cases using Claude 3 Sonnet
 5. **Automation Agent** → Execute tests via WebdriverIO
 6. **Manager Agent** → Orchestrate and coordinate workflow
 
 ### Key Technologies
 - **🤖 LangGraph**: Multi-agent orchestration framework
 - **🔗 LangChain**: LLM application framework  
-- **🧠 OpenAI GPT-4**: Language model for test generation
+- **☁️ AWS Bedrock**: Enterprise LLM service with Claude models
 - **📊 Ollama**: Local embedding model server
 - **🗄️ Chroma**: Vector database for RAG
 - **🌐 WebdriverIO**: Browser automation framework
 - **📋 Jira API**: Requirements and story management
+
+### Migration Benefits
+- **💰 Cost Savings**: ~70% reduction in LLM costs vs OpenAI
+- **🔒 Enhanced Security**: Data stays within your AWS account
+- **📏 Higher Limits**: 200k token context window with Claude
+- **🏢 Enterprise Ready**: Better compliance and audit trails
 
 ---
 
