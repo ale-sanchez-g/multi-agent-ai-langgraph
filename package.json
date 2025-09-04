@@ -1,0 +1,26 @@
+{
+  "name": "multi-agent-qa-webdriver-server",
+  "version": "1.0.0",
+  "description": "WebdriverIO server for multi-agent QA automation",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.0",
+    "webdriverio": "^8.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.0"
+  },
+  "keywords": [
+    "webdriverio",
+    "automation",
+    "testing",
+    "multi-agent",
+    "qa"
+  ],
+  "author": "Your Name",
+  "license": "MIT"
+}
