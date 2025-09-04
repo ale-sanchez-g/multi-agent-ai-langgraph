@@ -30,9 +30,18 @@ app.post("/click", async (req, res) => {
   if (!browser) return res.status(400).send("Browser not open");
   const { selector } = req.body;
   if (!selector) return res.status(400).send("No selector provided");
-  const elem = await browser.$(selector);
-  await elem.click();
-  res.send(`Clicked ${selector}`);
+  try {
+    const elem = await browser.$(selector);
+    const isExisting = await elem.isExisting();
+    if (!isExisting) {
+      return res.status(404).send(`Element with selector "${selector}" not found on the page`);
+    }
+    await elem.waitForDisplayed({ timeout: 5000 });
+    await elem.click();
+    res.send(`Clicked ${selector}`);
+  } catch (e) {
+    res.status(500).send(`Error clicking ${selector}: ${e.message}`);
+  }
 });
 
 app.post("/set-value", async (req, res) => {
@@ -40,9 +49,18 @@ app.post("/set-value", async (req, res) => {
   const { selector, value } = req.body;
   if (!selector || value === undefined)
     return res.status(400).send("Selector and value required");
-  const elem = await browser.$(selector);
-  await elem.setValue(value);
-  res.send(`Set value for ${selector}`);
+  try {
+    const elem = await browser.$(selector);
+    const isExisting = await elem.isExisting();
+    if (!isExisting) {
+      return res.status(404).send(`Element with selector "${selector}" not found on the page`);
+    }
+    await elem.waitForDisplayed({ timeout: 5000 });
+    await elem.setValue(value);
+    res.send(`Set value for ${selector}`);
+  } catch (e) {
+    res.status(500).send(`Error setting value for ${selector}: ${e.message}`);
+  }
 });
 
 app.post("/source", async (req, res) => {
@@ -86,10 +104,14 @@ app.post("/scroll-to", async (req, res) => {
   if (!selector) return res.status(400).send("No selector provided");
   try {
     const elem = await browser.$(selector);
+    const isExisting = await elem.isExisting();
+    if (!isExisting) {
+      return res.status(404).send(`Element with selector "${selector}" not found on the page`);
+    }
     await elem.scrollIntoView();
     res.send(`Scrolled to ${selector}`);
   } catch (e) {
-    res.status(500).send(`Error scrolling to element: ${e}`);
+    res.status(500).send(`Error scrolling to element: ${e.message}`);
   }
 });
 
@@ -100,10 +122,28 @@ app.post("/get-text", async (req, res) => {
   if (!selector) return res.status(400).send("No selector provided");
   try {
     const elem = await browser.$(selector);
+    const isExisting = await elem.isExisting();
+    if (!isExisting) {
+      return res.status(404).send(`Element with selector "${selector}" not found on the page`);
+    }
     const text = await elem.getText();
     res.send(text);
   } catch (e) {
-    res.status(500).send(`Error getting text: ${e}`);
+    res.status(500).send(`Error getting text: ${e.message}`);
+  }
+});
+
+// Check if element exists
+app.post("/element-exists", async (req, res) => {
+  if (!browser) return res.status(400).send("Browser not open");
+  const { selector } = req.body;
+  if (!selector) return res.status(400).send("No selector provided");
+  try {
+    const elem = await browser.$(selector);
+    const isExisting = await elem.isExisting();
+    res.json({ exists: isExisting, selector: selector });
+  } catch (e) {
+    res.status(500).send(`Error checking element existence: ${e.message}`);
   }
 });
 
